@@ -8,7 +8,7 @@ type Props = {
 function Destination({ destination, className }: Props) {
   return (
     <div
-      className={`flex-1 bg-gray-500/20 sm:max-w-1/2 sm: min-w-1/4 px-4 py-3 rounded-xl ${
+      className={`flex-1 bg-gray-500/20 max-w-1/2 sm: min-w-1/4 px-4 py-3 rounded-xl ${
         className ?? ''
       }`}
       key={destination.name}
