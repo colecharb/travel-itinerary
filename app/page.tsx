@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function HomePage() {
   return (
-    <main className='flex flex-col items-center justify-center min-h-screen text-center'>
+    <main className='flex flex-col items-center justify-center h-dvh text-center'>
       <h1 className='text-5xl font-bold mb-6'>triptico</h1>
       <p className='mb-6 text-lg'>Plan your dream trip with AI assistance.</p>
       <Link
