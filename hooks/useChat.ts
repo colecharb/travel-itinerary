@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
-import { chatMessagesAtom, Message } from '../store/chatAtoms';
+import { chatMessagesAtom, TAiMessage, TUserMessage } from '../store/chatAtoms';
 import { v4 as uuid } from 'uuid';
 
 export const useChat = () => {
@@ -14,7 +14,7 @@ export const useChat = () => {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userMessage: Message = {
+    const userMessage: TUserMessage = {
       chatId,
       timestamp: new Date().toISOString(),
       id: uuid(),
@@ -33,7 +33,7 @@ export const useChat = () => {
         chatId,
         chatHistory: messages,
       };
-      console.log(bodyJson);
+      // console.log(bodyJson);
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -44,11 +44,13 @@ export const useChat = () => {
 
       const data = await res.json();
 
-      const aiMessage: Message = {
+      const aiMessage: TAiMessage = {
         timestamp: new Date().toISOString(),
+        chatId,
         id: data.id,
         sender: 'ai',
         text: data.text,
+        title: data.title,
         destinations: data.destinations,
         itinerary: data.itinerary,
       };
