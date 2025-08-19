@@ -1,13 +1,35 @@
 import { atom } from 'jotai';
 
-export type Message = {
-  chatId?: string;
+type TDestination = {
+  name: string;
+  reason: string;
+};
+
+type TUserMessage = {
+  chatId: string;
   timestamp: string;
   id: string | undefined;
-  sender: 'user' | 'ai';
+  sender: 'user';
   text: string;
-  destinations?: string[];
+  title?: string;
+  destinations?: TDestination[];
   itinerary?: string;
 };
 
-export const chatMessagesAtom = atom<Message[]>([]);
+type TAiMessage = {
+  chatId: string;
+  timestamp: string;
+  id: string | undefined;
+  sender: 'ai';
+  text: string;
+  title?: string;
+  destinations?: TDestination[];
+  itinerary?: string;
+};
+
+type TGenericMessage = TUserMessage | TAiMessage;
+
+const chatMessagesAtom = atom<TGenericMessage[]>([]);
+
+export type { TDestination, TUserMessage, TAiMessage, TGenericMessage };
+export { chatMessagesAtom };
