@@ -1,7 +1,7 @@
 // import { OpenAI } from 'openai';
 import { CohereClient } from 'cohere-ai';
-import onlyJson from '../../prompts/onlyJson';
-import { Message } from '@/store/chatAtoms';
+import onlyJson from '../../../prompts/onlyJson';
+import { TAiMessage, TGenericMessage } from '@/store/chatAtoms';
 import { Message as CohereMessage } from 'cohere-ai/api';
 
 // const openai = new OpenAI({
@@ -12,7 +12,7 @@ const cohere = new CohereClient({
   token: process.env.COHERE_API_KEY,
 });
 
-type ChatResponse = Pick<Message, 'id' | 'text' | 'destinations' | 'itinerary'>;
+// type ChatResponse = TAiMessage; //Pick<TAiMessage, 'id' | 'text' | 'destinations' | 'itinerary'>;
 
 // async function getOpenAIResponse(
 //   prompt: string,
@@ -46,9 +46,9 @@ type ChatResponse = Pick<Message, 'id' | 'text' | 'destinations' | 'itinerary'>;
 
 async function getCohereResponse(
   prompt: string,
-  // chatId?: string,
+  chatId: string,
   chatHistory?: CohereMessage[],
-): Promise<ChatResponse> {
+): Promise<TAiMessage> {
   // console.log(chatId);
 
   const response = await cohere.chat({
@@ -72,8 +72,12 @@ async function getCohereResponse(
   }
 
   return {
+    sender: 'ai',
+    timestamp: new Date().toISOString(),
+    chatId,
     id: response.responseId, // Generate a unique ID for Cohere responses
     text,
+    title: parsed.title || '',
     destinations: parsed.destinations || [],
     itinerary: parsed.itinerary || '',
   };
@@ -81,11 +85,11 @@ async function getCohereResponse(
 
 export async function POST(request: Request) {
   try {
-    const { message, chatHistory } = (await request.json()) as {
-      message: string | undefined;
+    const { message, chatId, chatHistory } = (await request.json()) as {
+      message: string;
       prevResponseId: string | undefined;
-      chatId: string | undefined;
-      chatHistory: Message[] | undefined;
+      chatId: string;
+      chatHistory: TGenericMessage[] | undefined;
     };
 
     // console.log(prevResponseId);
@@ -101,7 +105,7 @@ export async function POST(request: Request) {
       message: chatMessage.text,
       role: chatMessage.sender === 'user' ? 'USER' : 'CHATBOT',
     }));
-    const response = await getCohereResponse(prompt, cohereHistory);
+    const response = await getCohereResponse(prompt, chatId, cohereHistory);
     // const response = await getOpenAIResponse(prompt, prevResponseId);
 
     return Response.json(response);
